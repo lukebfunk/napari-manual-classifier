@@ -98,7 +98,10 @@ class Classifier(QWidget):
 		self.class_buttons.append(QPushButton('{class_name} [{num}]'.format(
 			class_name=self.classes[-1], num=len(self.classes)),
 			self))
-		self.class_buttons[-1].clicked.connect(lambda: self.classify_frame(self.classes[-1]))
+
+		self.class_buttons[-1].clicked.connect(lambda: self.classify_frame(chosen_class=self.classes[-1]))
+		self.viewer.bind_key(key=str(len(self.classes)),func=lambda x: self.classify_frame(chosen_class=self.classes[-1]))
+
 		self.classes_layout.addWidget(self.class_buttons[-1])
 
 	def classify_frame(self,chosen_class):
