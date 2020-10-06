@@ -24,6 +24,7 @@ class Classifier(QWidget):
 
 		self.viewer = viewer
 		self.metadata_levels = metadata_levels
+		self.shape = self.viewer.layers[0].shape
 
 		if len(self.viewer.layers)!=1:
 			# TODO: open file dialog to select image (have to integrate with napari io)
@@ -107,6 +108,17 @@ class Classifier(QWidget):
 	def classify_frame(self,key_press,chosen_class):
 		coords = self.viewer.layers[0].coordinates[:-2]
 		self.df_metadata.loc[coords+('annotated_class',)] = chosen_class
+		if self.shape[:-2]==coords:
+			# last slice
+			pass
+		else:
+			for level,(current,total) in enumerate(zip(coords[::-1],self.shape[::-1])):
+				if current<total:
+					self.viewer.dims._increment_dims_right(axis=(-3-level))
+				else:
+					self.viewer.dims._set_current_step(axis=(-3-level),value=0)
+					self.viewer.dims._increment_dims_right(axis=(-4-level))
+
 
 	def save_results(self):
 		filename = QFileDialog.getSaveFileName(self,
