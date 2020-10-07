@@ -158,6 +158,8 @@ class Classifier(QWidget):
 			int((len(self.classes)-1)/MAXIMUM_CLASS_BUTTONS_PER_COLUMN)
 			)
 
+		self.new_class_text.clear()
+
 
 	def classify_frame(self,key_press,chosen_class):
 		coords = self.viewer.layers[0].coordinates[:-2]
