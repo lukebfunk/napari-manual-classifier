@@ -1,6 +1,7 @@
 import os
 from functools import partial
 import napari
+from napari._qt.qt_error_notification import NapariNotification
 import pandas as pd
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import (QWidget,
@@ -94,6 +95,12 @@ class Classifier(QWidget):
 		self.class_buttons = []
 
 	def load_metadata(self):
+		msg = QMessageBox()
+		msg.setIcon(QMessageBox.Information)
+		msg.setText(("Use the following dialog to choose a metadata table to open, "
+						"otherwise click 'cancel' to use an automatically generated table."))
+		msg.exec()
+
 		filename = QFileDialog.getOpenFileName(self,'Open metadata table',DEFAULT_PATH,'Metadata table (*.csv *.hdf)')
 
 		self.df_metadata = None
@@ -129,6 +136,16 @@ class Classifier(QWidget):
 
 	def classify_frame(self,key_press,chosen_class):
 		coords = self.viewer.layers[0].coordinates[:-2]
+
+		if self.df_metadata.loc[coords+('annotated_class',)] is not None:
+			previous_class = self.df_metadata.loc[coords+('annotated_class',)]
+			if previous_class != chosen_class:
+				coords_string = ', '.join([f'{level}={val}' for level,val in zip(self.metadata_levels,coords)])
+				overwrite_notification = NapariNotification((f'{coords_string} previously annotated as '
+								f'`{previous_class}`, overwriting annotation as `{chosen_class}`'),
+								severity='info')
+				overwrite_notification.show()
+
 		self.df_metadata.loc[coords+('annotated_class',)] = chosen_class
 		if self.shape[:-2]==coords:
 			# last slice
