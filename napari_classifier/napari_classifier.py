@@ -22,6 +22,8 @@ GUI_MINIMUM_WIDTH = 500
 CLASS_PANEL_MINIMUM_WIDTH = 250
 GUI_MAXIMUM_HEIGHT = 250
 
+MAXIMUM_CLASS_BUTTONS_PER_COLUMN = 4
+
 class Classifier(QWidget):
 	def __init__(self, viewer, metadata_levels, *args, **kwargs):
 		super(Classifier,self).__init__(*args,**kwargs)
@@ -57,11 +59,6 @@ class Classifier(QWidget):
 		# initialize widget
 		layout = QHBoxLayout()
 
-		self.add_class_button = QPushButton('Add class',self)
-		self.new_class_text = QLineEdit(self)
-		self.new_class_text.setAlignment(Qt.AlignLeft)
-		self.save_button = QPushButton('Save...',self)
-
 		## io panel
 		save_button = QPushButton('Save...',self)
 		save_button.clicked.connect(self.save_results)
@@ -69,18 +66,30 @@ class Classifier(QWidget):
 		io_layout = QVBoxLayout()
 		io_layout.addWidget(save_button)
 		io_panel.setLayout(io_layout)
-		# io_panel.setMaximumWidth(GUI_MAXIMUM_WIDTH/4)
 		layout.addWidget(io_panel)
 
-		# initialize class panel
-		self.classes_panel = QGroupBox('classes')
-		self.classes_layout = QHBoxLayout()
-		self.classes_layout.addWidget(self.add_class_button)
-		self.classes_layout.addWidget(self.new_class_text)
-		self.classes_panel.setMaximumWidth(GUI_MAXIMUM_WIDTH)
-		self.classes_panel.setMinimumWidth(GUI_MINIMUM_WIDTH)
-		self.classes_panel.setLayout(self.classes_layout)
-		layout.addWidget(self.classes_panel)
+		## class panel
+		classes_panel = QGroupBox('classes')
+		classes_panel.setMinimumWidth(CLASS_PANEL_MINIMUM_WIDTH)
+
+		### layout for adding classes
+		add_classes_layout = QHBoxLayout()
+		add_class_button = QPushButton('Add class',self)
+		add_class_button.clicked.connect(self.add_class)
+		self.new_class_text = QLineEdit(self)
+		self.new_class_text.setAlignment(Qt.AlignLeft)
+		add_classes_layout.addWidget(add_class_button)
+		add_classes_layout.addWidget(self.new_class_text)
+
+		### layout for class buttons
+		self.class_button_layout = QGridLayout()
+
+		### add sub layouts to class panel
+		classes_layout = QVBoxLayout()
+		classes_layout.addLayout(add_classes_layout)
+		classes_layout.addLayout(self.class_button_layout)
+		classes_panel.setLayout(classes_layout)
+		layout.addWidget(classes_panel)
 
 		## set widget layout
 		layout.setAlignment(Qt.AlignTop)
@@ -89,10 +98,8 @@ class Classifier(QWidget):
 		self.setMaximumHeight(GUI_MAXIMUM_HEIGHT)
 		self.setMaximumWidth(GUI_MAXIMUM_WIDTH)
 
-		self.add_class_button.clicked.connect(self.add_class)
-		self.save_button.clicked.connect(self.save_results)
+		# initialize list of classes
 		self.classes = []
-		self.class_buttons = []
 
 	def load_metadata(self):
 		msg = QMessageBox()
@@ -126,13 +133,31 @@ class Classifier(QWidget):
 
 	def add_class(self):
 		self.classes.append(self.new_class_text.text())
-		self.class_buttons.append(QPushButton('{class_name} [{num}]'.format(
-			class_name=self.classes[-1], num=len(self.classes)),
-			self))
-		self.class_buttons[-1].clicked.connect(partial(self.classify_frame,key_press=None,chosen_class=self.classes[-1]))
-		self.viewer.bind_key(key=str(len(self.classes)),func=partial(self.classify_frame,chosen_class=self.classes[-1]))
 
-		self.classes_layout.addWidget(self.class_buttons[-1])
+		if len(self.classes)<10:
+			# shortcut key binding available
+			self.viewer.bind_key(key=str(len(self.classes)),
+				func=partial(self.classify_frame,chosen_class=self.classes[-1]),
+				overwrite=True)
+			new_class_button = QPushButton('{class_name} [{num}]'.format(
+				class_name=self.classes[-1], num=len(self.classes)),
+				self)
+		else:
+			# shortcut key binding not available
+			many_classes_notification = NapariNotification(
+				('Shortcut key bindings not available with the 10th or further class'),
+				severity='info')
+			many_classes_notification.show()
+
+			new_class_button = QPushButton(self.classes[-1],self)
+	
+		new_class_button.clicked.connect(partial(self.classify_frame,key_press=None,chosen_class=self.classes[-1]))
+
+		self.class_button_layout.addWidget(new_class_button,
+			((len(self.classes)-1)%MAXIMUM_CLASS_BUTTONS_PER_COLUMN),
+			int((len(self.classes)-1)/MAXIMUM_CLASS_BUTTONS_PER_COLUMN)
+			)
+
 
 	def classify_frame(self,key_press,chosen_class):
 		coords = self.viewer.layers[0].coordinates[:-2]
