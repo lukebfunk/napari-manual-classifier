@@ -27,9 +27,13 @@ class Classifier(QWidget):
 
 		self.viewer = viewer
 
-		if len(self.viewer.layers)!=1:
-			# TODO: open file dialog to select image (have to integrate with napari io)
-			raise ValueError('Please have a single image/layer open in napari before running classifier')
+		# open image if not already open
+		while len(self.viewer.layers)!=1:
+			msg = QMessageBox()
+			msg.setIcon(QMessageBox.Information)
+			msg.setText("No image open, please select an image in the following dialog.")
+			msg.exec()
+			self.viewer.window.qt_viewer._open_files_dialog()
 
 		# get image shape
 		self.shape = self.viewer.layers[0].shape
