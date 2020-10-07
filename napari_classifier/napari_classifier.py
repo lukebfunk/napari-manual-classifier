@@ -22,28 +22,32 @@ CLASS_PANEL_MINIMUM_WIDTH = 250
 GUI_MAXIMUM_HEIGHT = 250
 
 class Classifier(QWidget):
-	def __init__(self,viewer,metadata_levels,*args,**kwargs):
+	def __init__(self, viewer, metadata_levels, *args, **kwargs):
 		super(Classifier,self).__init__(*args,**kwargs)
 
 		self.viewer = viewer
-		self.metadata_levels = metadata_levels
-		self.shape = self.viewer.layers[0].shape
 
 		if len(self.viewer.layers)!=1:
 			# TODO: open file dialog to select image (have to integrate with napari io)
 			raise ValueError('Please have a single image/layer open in napari before running classifier')
 
+		# get image shape
+		self.shape = self.viewer.layers[0].shape
+
+		# check metadata levels
+		if not metadata_levels:
+			self.metadata_levels = [f'dim_{dim}' for dim in range(len(self.shape[:-2]))]
+		elif len(metadata_levels)!=len(self.shape[:-2]):
+			metadata_levels_warning = NapariNotification((f'Number of metadata_levels ({len(metadata_levels)}) does not match '
+								f'number of leading image dimensions ({len(self.shape[:-2])}); will use default metadata_levels.'),
+								severity='warning')
+			metadata_levels_warning.show()
+			self.metadata_levels = [f'dim_{dim}' for dim in range(len(self.shape[:-2]))]
+		else:
+			self.metadata_levels = metadata_levels
+
+		# load metadata
 		self.load_metadata()
-
-		leading_dims = self.viewer.layers[0].shape[:-2]
-
-		if self.df_metadata is None:
-			from itertools import product
-			self.df_metadata = pd.DataFrame([{level:idx for level,idx in zip(self.metadata_levels,indices)} 
-				for indices in product(*(range(dim) for dim in leading_dims))]
-				)
-
-		self.df_metadata = self.df_metadata.assign(annotated_class=None).set_index(self.metadata_levels)
 
 		# initialize widget
 		layout = QHBoxLayout()
@@ -82,13 +86,13 @@ class Classifier(QWidget):
 
 		self.add_class_button.clicked.connect(self.add_class)
 		self.save_button.clicked.connect(self.save_results)
-
-		self.metadata_filename = None
 		self.classes = []
 		self.class_buttons = []
 
 	def load_metadata(self):
 		filename = QFileDialog.getOpenFileName(self,'Open metadata table',DEFAULT_PATH,'Metadata table (*.csv *.hdf)')
+
+		self.df_metadata = None
 		if filename[0]:
 			ext = filename[0].split('.')[-1]
 			if ext == 'csv':
@@ -97,9 +101,17 @@ class Classifier(QWidget):
 				self.df_metadata = pd.read_hdf(filename[0])
 			else:
 				print(f'filetype {ext} not recognized, creating default metadata table')
-				self.df_metadata = None
-		else:
-			self.df_metadata = None
+
+		if self.df_metadata is None:
+			from itertools import product
+			self.df_metadata = pd.DataFrame([{level:idx for level,idx in zip(self.metadata_levels,indices)} 
+				for indices in product(*(range(dim) for dim in self.shape[:-2]))]
+				)
+
+		if 'annotated_class' not in self.df_metadata.columns:
+			self.df_metadata = self.df_metadata.assign(annotated_class=None)
+
+		self.df_metadata = self.df_metadata.set_index(self.metadata_levels)
 
 	def add_class(self):
 		self.classes.append(self.new_class_text.text())
@@ -144,7 +156,7 @@ class Classifier(QWidget):
 			print('no file selected, did not save')
 
 
-def build_widget(viewer,metadata_levels=['cell']):
+def build_widget(viewer,metadata_levels=None):
 	classifier = Classifier(viewer,metadata_levels=metadata_levels)
 
 	viewer.window.add_dock_widget(classifier,
