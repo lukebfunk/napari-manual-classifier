@@ -4,9 +4,11 @@ import napari
 import pandas as pd
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import (QWidget,
-	QFileDialog, 
-	QVBoxLayout, 
-	QHBoxLayout, 
+	QMessageBox,
+	QFileDialog,
+	QVBoxLayout,
+	QHBoxLayout,
+	QGridLayout,
 	QPushButton,
 	QLineEdit,
 	QGroupBox
@@ -14,9 +16,10 @@ from qtpy.QtWidgets import (QWidget,
 
 DEFAULT_PATH = os.path.expanduser('~')
 
-GUI_MAXIMUM_WIDTH = 1000
-GUI_MINIMUM_WIDTH = 700
-GUI_MAXIMUM_HEIGHT = 350
+GUI_MAXIMUM_WIDTH = 2000
+GUI_MINIMUM_WIDTH = 500
+CLASS_PANEL_MINIMUM_WIDTH = 250
+GUI_MAXIMUM_HEIGHT = 250
 
 class Classifier(QWidget):
 	def __init__(self,viewer,metadata_levels,*args,**kwargs):
@@ -42,6 +45,7 @@ class Classifier(QWidget):
 
 		self.df_metadata = self.df_metadata.assign(annotated_class=None).set_index(self.metadata_levels)
 
+		# initialize widget
 		layout = QHBoxLayout()
 
 		self.add_class_button = QPushButton('Add class',self)
@@ -49,12 +53,14 @@ class Classifier(QWidget):
 		self.new_class_text.setAlignment(Qt.AlignLeft)
 		self.save_button = QPushButton('Save...',self)
 
-		# io panel
+		## io panel
+		save_button = QPushButton('Save...',self)
+		save_button.clicked.connect(self.save_results)
 		io_panel = QWidget()
 		io_layout = QVBoxLayout()
-		io_layout.addWidget(self.save_button)
+		io_layout.addWidget(save_button)
 		io_panel.setLayout(io_layout)
-		io_panel.setMaximumWidth(GUI_MAXIMUM_WIDTH)
+		# io_panel.setMaximumWidth(GUI_MAXIMUM_WIDTH/4)
 		layout.addWidget(io_panel)
 
 		# initialize class panel
@@ -67,9 +73,9 @@ class Classifier(QWidget):
 		self.classes_panel.setLayout(self.classes_layout)
 		layout.addWidget(self.classes_panel)
 
+		## set widget layout
 		layout.setAlignment(Qt.AlignTop)
 		layout.setSpacing(4)
-
 		self.setLayout(layout)
 		self.setMaximumHeight(GUI_MAXIMUM_HEIGHT)
 		self.setMaximumWidth(GUI_MAXIMUM_WIDTH)
