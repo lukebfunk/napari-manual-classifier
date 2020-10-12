@@ -26,7 +26,7 @@ GUI_MAXIMUM_HEIGHT = 250
 MAXIMUM_CLASS_BUTTONS_PER_COLUMN = 4
 
 class Classifier(QWidget):
-	def __init__(self, viewer, metadata_levels, *args, **kwargs):
+	def __init__(self, viewer, metadata_levels, initial_classes, *args, **kwargs):
 		super(Classifier,self).__init__(*args,**kwargs)
 
 		self.viewer = viewer
@@ -76,7 +76,7 @@ class Classifier(QWidget):
 		### layout for adding classes
 		add_classes_layout = QHBoxLayout()
 		add_class_button = QPushButton('Add class',self)
-		add_class_button.clicked.connect(self.add_class)
+		add_class_button.clicked.connect(self.click_add_class)
 		self.new_class_text = QLineEdit(self)
 		self.new_class_text.setAlignment(Qt.AlignLeft)
 		add_classes_layout.addWidget(add_class_button)
@@ -99,8 +99,12 @@ class Classifier(QWidget):
 		self.setMaximumHeight(GUI_MAXIMUM_HEIGHT)
 		self.setMaximumWidth(GUI_MAXIMUM_WIDTH)
 
-		# initialize list of classes
+		# initialize classes
 		self.classes = []
+
+		if initial_classes is not None:
+			for initial_class in initial_classes:
+				self.add_class(initial_class)
 
 	def load_metadata(self):
 		msg = QMessageBox()
@@ -132,8 +136,12 @@ class Classifier(QWidget):
 
 		self.df_metadata = self.df_metadata.set_index(self.metadata_levels)
 
-	def add_class(self):
-		self.classes.append(self.new_class_text.text())
+	def click_add_class(self):
+		self.add_class(self.new_class_text.text())
+		self.new_class_text.clear()
+
+	def add_class(self,new_class):
+		self.classes.append(new_class)
 
 		if len(self.classes)<10:
 			# shortcut key binding available
@@ -158,8 +166,6 @@ class Classifier(QWidget):
 			((len(self.classes)-1)%MAXIMUM_CLASS_BUTTONS_PER_COLUMN),
 			int((len(self.classes)-1)/MAXIMUM_CLASS_BUTTONS_PER_COLUMN)
 			)
-
-		self.new_class_text.clear()
 
 
 	def classify_frame(self,key_press,chosen_class):
@@ -210,8 +216,8 @@ class Classifier(QWidget):
 			print('no file selected, did not save')
 
 
-def build_widget(viewer,metadata_levels=None):
-	classifier = Classifier(viewer,metadata_levels=metadata_levels)
+def build_widget(viewer, metadata_levels=None, initial_classes=['interphase','prophase','metaphase','anaphase/telophase','apoptosis/death']):
+	classifier = Classifier(viewer, metadata_levels=metadata_levels, initial_classes=initial_classes)
 
 	viewer.window.add_dock_widget(classifier,
 		name='classifier',
