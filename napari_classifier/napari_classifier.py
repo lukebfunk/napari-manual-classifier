@@ -107,23 +107,23 @@ class Classifier(QWidget):
 				self.add_class(initial_class)
 
 	def load_metadata(self):
-		msg = QMessageBox()
-		msg.setIcon(QMessageBox.Information)
-		msg.setText(("Use the following dialog to choose a metadata table to open, "
-						"otherwise click 'cancel' to use an automatically generated table."))
-		msg.exec()
+		# msg = QMessageBox()
+		# msg.setIcon(QMessageBox.Information)
+		# msg.setText(("Use the following dialog to choose a metadata table to open, "
+		# 				"otherwise click 'cancel' to use an automatically generated table."))
+		# msg.exec()
 
-		filename = QFileDialog.getOpenFileName(self,'Open metadata table',DEFAULT_PATH,'Metadata table (*.csv *.hdf)')
+		# filename = QFileDialog.getOpenFileName(self,'Open metadata table',DEFAULT_PATH,'Metadata table (*.csv *.hdf)')
 
 		self.df_metadata = None
-		if filename[0]:
-			ext = filename[0].split('.')[-1]
-			if ext == 'csv':
-				self.df_metadata = pd.read_csv(filename[0])
-			elif ext == 'hdf':
-				self.df_metadata = pd.read_hdf(filename[0])
-			else:
-				print(f'filetype {ext} not recognized, creating default metadata table')
+		# if filename[0]:
+		# 	ext = filename[0].split('.')[-1]
+		# 	if ext == 'csv':
+		# 		self.df_metadata = pd.read_csv(filename[0])
+		# 	elif ext == 'hdf':
+		# 		self.df_metadata = pd.read_hdf(filename[0])
+		# 	else:
+		# 		print(f'filetype {ext} not recognized, creating default metadata table')
 
 		if self.df_metadata is None:
 			from itertools import product
