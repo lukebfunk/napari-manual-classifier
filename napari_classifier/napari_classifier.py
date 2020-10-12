@@ -3,6 +3,7 @@ from functools import partial
 import napari
 from napari._qt.qt_error_notification import NapariNotification
 import pandas as pd
+import numpy as np
 from qtpy.QtCore import Qt
 from qtpy.QtWidgets import (QWidget,
 	QMessageBox,
@@ -164,26 +165,31 @@ class Classifier(QWidget):
 	def classify_frame(self,key_press,chosen_class):
 		coords = self.viewer.layers[0].coordinates[:-2]
 
-		if self.df_metadata.loc[coords+('annotated_class',)] is not None:
-			previous_class = self.df_metadata.loc[coords+('annotated_class',)]
+		coords_string = ', '.join([f'{level}={val}' for level,val in zip(self.metadata_levels,coords)])
+		if self.df_metadata.loc[(coords),('annotated_class')] is not None:
+			previous_class = self.df_metadata.loc[(coords),('annotated_class')]
 			if previous_class != chosen_class:
-				coords_string = ', '.join([f'{level}={val}' for level,val in zip(self.metadata_levels,coords)])
 				overwrite_notification = NapariNotification((f'{coords_string} previously annotated as '
 								f'`{previous_class}`, overwriting annotation as `{chosen_class}`'),
 								severity='info')
 				overwrite_notification.show()
+		else:
+			annotate_notification = NapariNotification((f'Annotating {coords_string} as `{chosen_class}`'),
+									severity='info')
+			annotate_notification.show()
 
-		self.df_metadata.loc[coords+('annotated_class',)] = chosen_class
-		if self.shape[:-2]==coords:
+		
+		self.df_metadata.loc[(coords),('annotated_class')] = chosen_class
+
+		if tuple(np.array(self.shape[:-2])-1)==coords:
 			# last slice
 			pass
 		else:
-			for level,(current,total) in enumerate(zip(coords[::-1],self.shape[::-1])):
-				if current<total:
-					self.viewer.dims._increment_dims_right(axis=(-3-level))
-				else:
-					self.viewer.dims._set_current_step(axis=(-3-level),value=0)
-					self.viewer.dims._increment_dims_right(axis=(-4-level))
+			if coords[-1]<(self.shape[-3]-1):
+				self.viewer.dims._increment_dims_right(axis=(-3))
+			else:
+				self.viewer.dims.set_current_step(axis=(-3),value=0)
+				self.viewer.dims._increment_dims_right(axis=(-4))
 
 
 	def save_results(self):
