@@ -169,6 +169,7 @@ class Classifier(QWidget):
 
 
 	def classify_frame(self,key_press,chosen_class):
+		# TODO: create an annotation status bar that reports class of current slice
 		coords = self.viewer.layers[0].coordinates[:-2]
 
 		coords_string = ', '.join([f'{level}={val}' for level,val in zip(self.metadata_levels,coords)])
@@ -201,7 +202,7 @@ class Classifier(QWidget):
 	def save_results(self):
 		filename = QFileDialog.getSaveFileName(self,
         	'Export classification data',
-        	os.path.join(DEFAULT_PATH, 'classified.csv'),
+        	os.path.join(DEFAULT_PATH, self.viewer.layers[0].name+'.classified.csv'),
         	'Classification files (*.csv *.hdf)')
 
 		if filename[0]:
