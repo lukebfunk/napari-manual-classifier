@@ -1,10 +1,10 @@
-# napari-classifier
+# napari-manual-classifier
 
-[![License](https://img.shields.io/pypi/l/napari-classifier.svg?color=green)](https://github.com/napari/napari-classifier/raw/master/LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/napari-classifier.svg?color=green)](https://pypi.org/project/napari-classifier)
-[![Python Version](https://img.shields.io/pypi/pyversions/napari-classifier.svg?color=green)](https://python.org)
-[![tests](https://github.com/lukebfunk/napari-classifier/workflows/tests/badge.svg)](https://github.com/lukebfunk/napari-classifier/actions)
-[![codecov](https://codecov.io/gh/lukebfunk/napari-classifier/branch/master/graph/badge.svg)](https://codecov.io/gh/lukebfunk/napari-classifier)
+[![License](https://img.shields.io/pypi/l/napari-manual-classifier.svg?color=green)](https://github.com/napari/napari-manual-classifier/raw/master/LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/napari-manual-classifier.svg?color=green)](https://pypi.org/project/napari-manual-classifier)
+[![Python Version](https://img.shields.io/pypi/pyversions/napari-manual-classifier.svg?color=green)](https://python.org)
+[![tests](https://github.com/lukebfunk/napari-manual-classifier/workflows/tests/badge.svg)](https://github.com/lukebfunk/napari-manual-classifier/actions)
+[![codecov](https://codecov.io/gh/lukebfunk/napari-manual-classifier/branch/master/graph/badge.svg)](https://codecov.io/gh/lukebfunk/napari-manual-classifier)
 
 Simple napari widget for annotating classes for each slice of an nd-image
 
@@ -22,9 +22,9 @@ https://napari.org/docs/plugins/index.html
 
 ## Installation
 
-You can install `napari-classifier` via [pip]:
+You can install `napari-manual-classifier` via [pip]:
 
-    pip install napari-classifier
+    pip install napari-manual-classifier
 
 ## Contributing
 
@@ -34,7 +34,7 @@ the coverage at least stays the same before you submit a pull request.
 ## License
 
 Distributed under the terms of the [MIT] license,
-"napari-classifier" is free and open source software
+"napari-manual-classifier" is free and open source software
 
 ## Issues
 
@@ -50,7 +50,7 @@ If you encounter any problems, please [file an issue] along with a detailed desc
 [Apache Software License 2.0]: http://www.apache.org/licenses/LICENSE-2.0
 [Mozilla Public License 2.0]: https://www.mozilla.org/media/MPL/2.0/index.txt
 [cookiecutter-napari-plugin]: https://github.com/napari/cookiecutter-napari-plugin
-[file an issue]: https://github.com/lukebfunk/napari-classifier/issues
+[file an issue]: https://github.com/lukebfunk/napari-manual-classifier/issues
 [napari]: https://github.com/napari/napari
 [tox]: https://tox.readthedocs.io/en/latest/
 [pip]: https://pypi.org/project/pip/
