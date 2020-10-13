@@ -3,4 +3,4 @@ try:
 except ImportError:
     __version__ = "unknown"
 
-from .napari_classifier import *
+from .napari_manual_classifier import *
