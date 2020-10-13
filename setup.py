@@ -22,7 +22,11 @@ with open('requirements.txt') as f:
 
 
 # https://github.com/pypa/setuptools_scm
-use_scm = {"write_to": "napari_manual_classifier/_version.py"}
+def local_scheme(version):
+    return ""
+
+use_scm = {"write_to": "napari_manual_classifier/_version.py",
+    "local_scheme":local_scheme}
 
 setup(
     name='napari-manual-classifier',
@@ -30,7 +34,7 @@ setup(
     author_email='lukefunk@broadinstitute.org',
     license='MIT',
     url='https://github.com/lukebfunk/napari-manual-classifier',
-    description='Simple napari widget for manually annotating classes for each slice of an nd-image',
+    description='Simple napari widget for manually annotating classes for each slice (last 2 dimensions) of ND-image',
     long_description=read('README.md'),
     long_description_content_type='text/markdown',
     packages=find_packages(),
