@@ -32,12 +32,16 @@ class Classifier(QWidget):
 		self.viewer = viewer
 
 		# open image if not already open
-		while len(self.viewer.layers)!=1:
+		if len(self.viewer.layers)<1:
 			msg = QMessageBox()
 			msg.setIcon(QMessageBox.Information)
 			msg.setText("No image open, please select an image in the following dialog.")
 			msg.exec()
 			self.viewer.window.qt_viewer._open_files_dialog()
+
+		if len(self.viewer.layers)<1:
+			# still no image open
+			raise ValueError("Could not find image layers.")
 
 		# get image shape
 		self.shape = self.viewer.layers[0].shape
