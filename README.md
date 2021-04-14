@@ -3,8 +3,6 @@
 [![License](https://img.shields.io/pypi/l/napari-manual-classifier.svg?color=green)](https://github.com/napari/napari-manual-classifier/raw/master/LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/napari-manual-classifier.svg?color=green)](https://pypi.org/project/napari-manual-classifier)
 [![Python Version](https://img.shields.io/pypi/pyversions/napari-manual-classifier.svg?color=green)](https://python.org)
-[![tests](https://github.com/lukebfunk/napari-manual-classifier/workflows/tests/badge.svg)](https://github.com/lukebfunk/napari-manual-classifier/actions)
-[![codecov](https://codecov.io/gh/lukebfunk/napari-manual-classifier/branch/master/graph/badge.svg)](https://codecov.io/gh/lukebfunk/napari-manual-classifier)
 
 Simple napari widget for annotating classes for each slice of an nd-image
 
@@ -26,10 +24,33 @@ You can install `napari-manual-classifier` via [pip]:
 
     pip install napari-manual-classifier
 
+## Introduction
+
+Import using:
+
+	from napari_manual_classifier import build_widget
+
+Start the widget by running:
+
+	build_widget(viewer)
+
+`viewer` is a napari viewer instance. `build_widget` also takes optional arguments:
+
+|argument|description|
+|--------|-----------|
+|metadata_levels|list of names for the leading dimensions of the image, used for formatting dataframe output|
+|initial_classes|list of class names to initialize as options|
+	
+
+If no layers are open when initializing the widget, a dialog box will open to select a desired image.
+
+Label the displayed image slice by either clicking the desired class button or pressing the corresponding number on the keyboard. This will automatically advance to display the next slice; however, you can always go back and re-classify a slice (warning will be displayed).
+
+Once finished, click the `Save...` button in the widget; this opens a dialog box to save a table with the resulting classifications.
+
 ## Contributing
 
-Contributions are very welcome. Tests can be run with [tox], please ensure
-the coverage at least stays the same before you submit a pull request.
+Contributions are very welcome.
 
 ## License
 
