@@ -24,7 +24,7 @@ You can install `napari-manual-classifier` via [pip]:
 
     pip install napari-manual-classifier
 
-## Introduction
+## Usage
 
 Import using:
 
@@ -45,6 +45,8 @@ Start the widget by running:
 If no layers are open when initializing the widget, a dialog box will open to select a desired image.
 
 Label the displayed image slice by either clicking the desired class button or pressing the corresponding number on the keyboard. This will automatically advance to display the next slice; however, you can always go back and re-classify a slice (warning will be displayed).
+
+Additional class options can be added by typing the class label in the text box in the "classes" box, and then clicking `Add class`.
 
 Once finished, click the `Save...` button in the widget; this opens a dialog box to save a table with the resulting classifications.
 
