@@ -221,7 +221,7 @@ class Classifier(QWidget):
 			print('no file selected, did not save')
 
 
-def build_widget(viewer, metadata_levels=None, initial_classes=['interphase','prophase','metaphase','anaphase/telophase','apoptosis/death']):
+def build_widget(viewer, metadata_levels=None, initial_classes=[]):
 	classifier = Classifier(viewer, metadata_levels=metadata_levels, initial_classes=initial_classes)
 
 	viewer.window.add_dock_widget(classifier,
